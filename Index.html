@@ -1,0 +1,1164 @@
+<!doctype html>
+<html lang="ms" class="h-full">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Analisis Peperiksaan KAFA</title>
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #667085;
+      --line: #d8dee8;
+      --soft: #f5f7fb;
+      --panel: #ffffff;
+      --brand: #143f34;
+      --brand-2: #1d8a6a;
+      --danger: #b42318;
+      --ok: #087443;
+      --blue: #175cd3;
+      --warn: #a15c00;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--soft);
+      color: var(--ink);
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+    .hidden { display: none !important; }
+    .center { text-align: center; }
+    .right { text-align: right; }
+    .muted { color: var(--muted); }
+
+    .login-page {
+      min-height: 100vh;
+      display: grid;
+      align-items: center;
+      padding: 24px;
+      background: linear-gradient(135deg, #e4f3ec, #f6f8fb);
+    }
+    .login-shell {
+      width: min(980px, 100%);
+      margin: auto;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(23, 32, 51, .08);
+    }
+    .login-head {
+      background: var(--brand);
+      color: white;
+      padding: 26px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .badge-logo {
+      width: 58px;
+      height: 58px;
+      border: 2px solid rgba(255,255,255,.8);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      flex: 0 0 auto;
+    }
+    .login-head h1 { margin: 0 0 5px; font-size: clamp(21px, 4vw, 32px); line-height: 1.15; }
+    .login-head p { margin: 0; font-weight: 700; color: #d9efe8; }
+    .login-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      padding: 22px;
+    }
+    .login-box, .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+    .login-box { padding: 20px; }
+    .login-box h2, .panel-title { margin: 0 0 14px; font-size: 18px; }
+
+    .field { display: grid; gap: 6px; margin-bottom: 12px; }
+    label { font-size: 12px; color: var(--muted); font-weight: 700; }
+    input, select {
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 10px 11px;
+      background: white;
+      color: var(--ink);
+      outline: none;
+    }
+    input:focus, select:focus {
+      border-color: var(--brand-2);
+      box-shadow: 0 0 0 3px rgba(29, 138, 106, .14);
+    }
+    .btn {
+      border: 0;
+      border-radius: 6px;
+      min-height: 40px;
+      padding: 10px 14px;
+      font-weight: 700;
+      color: white;
+      background: var(--brand);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+    .btn:hover { background: #0f4c3a; }
+    .btn.secondary {
+      background: #eef2f6;
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .app-shell { min-height: 100vh; display: flex; flex-direction: column; }
+    .app-header {
+      background: var(--brand);
+      color: white;
+      padding: 14px 18px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      box-shadow: 0 4px 14px rgba(20, 63, 52, .18);
+    }
+    .header-inner { width: min(1320px, 100%); margin: 0 auto; display: grid; gap: 12px; }
+    .brand-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+    .brand-title { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .brand-title h1 { margin: 0; font-size: clamp(16px, 2.4vw, 23px); line-height: 1.2; }
+    .brand-title p { margin: 2px 0 0; color: #d9efe8; font-size: 12px; font-weight: 700; }
+    .small-badge {
+      width: 42px;
+      height: 42px;
+      border: 2px solid rgba(255,255,255,.8);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      flex: 0 0 auto;
+    }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tab-btn {
+      border: 1px solid rgba(255,255,255,.2);
+      background: rgba(255,255,255,.1);
+      color: white;
+      border-radius: 6px;
+      padding: 9px 11px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .tab-btn.active { background: white; color: var(--brand); }
+    main { width: min(1320px, 100%); margin: 0 auto; padding: 18px; flex: 1; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: grid; gap: 16px; }
+    .panel { padding: 16px; }
+    .toolbar {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(180px, 1fr)) auto;
+      gap: 12px;
+      align-items: end;
+    }
+    .toolbar.two { grid-template-columns: repeat(2, minmax(180px, 1fr)) auto; }
+
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: white; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { border-bottom: 1px solid #e6ebf2; padding: 9px 10px; text-align: left; vertical-align: top; }
+    th { background: #eef3f0; font-weight: 800; color: #243126; white-space: nowrap; }
+    tbody tr:hover { background: #fbfcfe; }
+    .mark-input { max-width: 92px; text-align: center; padding: 8px; }
+    .row-actions { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+    .mini-btn {
+      min-height: 32px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #f8fafc;
+      padding: 6px 9px;
+      font-weight: 800;
+      color: var(--ink);
+    }
+    .mini-btn.active { background: var(--brand); color: white; border-color: var(--brand); }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 38px;
+      border-radius: 999px;
+      padding: 4px 8px;
+      font-size: 12px;
+      font-weight: 800;
+      background: #eef2f6;
+      color: var(--ink);
+    }
+    .grade-a { background: #ddf7e9; color: var(--ok); }
+    .grade-b { background: #e8f1ff; color: var(--blue); }
+    .grade-c { background: #fff4df; color: var(--warn); }
+    .grade-d { background: #fff0ed; color: var(--danger); }
+    .grade-x { background: #eef2f6; color: #475467; }
+    .sub-lines { display: grid; gap: 4px; line-height: 1.35; }
+    .alert {
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-weight: 700;
+      font-size: 13px;
+      border: 1px solid #b7dbc9;
+      background: #edfdf4;
+      color: var(--ok);
+    }
+    .alert.error { border-color: #f7b4ac; background: #fff0ed; color: var(--danger); }
+
+    .chart-grid { display: grid; gap: 12px; }
+    .chart-row {
+      display: grid;
+      grid-template-columns: minmax(110px, 170px) 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+    .chart-label { font-weight: 800; font-size: 13px; }
+    .bar-pack { display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
+    .bar-track { height: 30px; background: #eef2f6; border-radius: 5px; overflow: hidden; border: 1px solid #e0e7ef; }
+    .bar-fill { height: 100%; min-width: 2px; }
+    .bar-caption { font-size: 11px; color: var(--muted); white-space: nowrap; }
+
+    .slip-stack { display: grid; gap: 16px; }
+    .slip {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      page-break-after: always;
+      page-break-inside: avoid;
+    }
+    .slip:last-child { page-break-after: auto; }
+    .slip-head {
+      display: grid;
+      grid-template-columns: 62px 1fr 62px;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .slip-logo {
+      width: 56px;
+      height: 56px;
+      border: 2px solid #172033;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 13px;
+      margin: auto;
+    }
+    .slip h2, .slip h3, .slip p { margin: 3px 0; text-align: center; }
+    .slip h2 { font-size: 16px; }
+    .slip h3 { font-size: 14px; }
+    .compact-table th, .compact-table td { padding: 6px; font-size: 12px; }
+    .signature-table td { height: 54px; text-align: center; vertical-align: bottom; }
+    .parent-shell { min-height: 100vh; padding: 18px; }
+    .parent-inner { width: min(960px, 100%); margin: 0 auto; display: grid; gap: 14px; }
+
+    @media (max-width: 860px) {
+      .login-grid, .toolbar, .toolbar.two { grid-template-columns: 1fr; }
+      .brand-row { align-items: flex-start; }
+      .tabs { overflow-x: auto; flex-wrap: nowrap; padding-bottom: 2px; }
+      .tab-btn { white-space: nowrap; }
+      main { padding: 12px; }
+      .chart-row { grid-template-columns: 1fr; }
+    }
+
+    @media print {
+      .no-print, .app-header { display: none !important; }
+      body { background: white; }
+      main, .parent-shell { padding: 0; width: 100%; }
+      .panel, .slip { border: 0; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <section id="login-page" class="login-page">
+    <div class="login-shell">
+      <div class="login-head">
+        <div class="badge-logo">KSKK</div>
+        <div>
+          <h1>SISTEM ANALISIS PEPERIKSAAN KAFA</h1>
+          <p>KAFA SK KOMPLEKS KLIA</p>
+        </div>
+      </div>
+      <div class="login-grid">
+        <form id="teacher-login" class="login-box">
+          <h2>Login Guru</h2>
+          <div class="field">
+            <label for="teacher-password">Password Guru</label>
+            <input id="teacher-password" type="password" autocomplete="current-password" required>
+          </div>
+          <button class="btn" type="submit">Login Guru</button>
+        </form>
+        <form id="parent-login" class="login-box">
+          <h2>Login Ibu Bapa</h2>
+          <div class="field">
+            <label for="parent-ic">Nombor IC Anak</label>
+            <input id="parent-ic" type="text" inputmode="numeric" placeholder="Contoh: 120101010001" required>
+          </div>
+          <button class="btn" type="submit">Login Ibu Bapa</button>
+        </form>
+      </div>
+      <div id="login-alert" class="hidden" style="margin:0 22px 22px;"></div>
+    </div>
+  </section>
+
+  <section id="teacher-app" class="app-shell hidden">
+    <header class="app-header">
+      <div class="header-inner">
+        <div class="brand-row">
+          <div class="brand-title">
+            <div class="small-badge">KSKK</div>
+            <div>
+              <h1>Sistem Analisis Peperiksaan KAFA</h1>
+              <p>KAFA SK KOMPLEKS KLIA</p>
+            </div>
+          </div>
+          <button id="teacher-logout" class="btn secondary no-print" type="button">Log Keluar</button>
+        </div>
+        <nav class="tabs no-print" aria-label="Tab utama guru">
+          <button class="tab-btn active" type="button" data-tab="input">Input Markah</button>
+          <button class="tab-btn" type="button" data-tab="individu">Analisis Individu</button>
+          <button class="tab-btn" type="button" data-tab="prestasi">Analisis Prestasi Mata Pelajaran</button>
+          <button class="tab-btn" type="button" data-tab="kedudukan">Kedudukan Murid</button>
+          <button class="tab-btn" type="button" data-tab="pelaporan">Pelaporan</button>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <div id="app-alert" class="hidden no-print"></div>
+
+      <section id="tab-input" class="tab-panel active">
+        <div class="panel no-print">
+          <h2 class="panel-title">TAB INPUT MARKAH</h2>
+          <div class="toolbar">
+            <div class="field"><label for="input-class">Kelas</label><select id="input-class"></select></div>
+            <div class="field"><label for="input-assessment">Pentaksiran</label><select id="input-assessment"></select></div>
+            <div class="field"><label for="input-subject">Subjek</label><select id="input-subject"></select></div>
+            <button id="save-marks" class="btn" type="button">Simpan Markah</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div id="input-table-hint" class="muted">Sila pilih kelas, pentaksiran dan subjek.</div>
+          <div id="input-table-wrap" class="table-wrap hidden"></div>
+        </div>
+      </section>
+
+      <section id="tab-individu" class="tab-panel">
+        <div class="panel no-print">
+          <h2 class="panel-title">TAB ANALISIS INDIVIDU</h2>
+          <div class="toolbar two">
+            <div class="field"><label for="individual-class">Kelas</label><select id="individual-class"></select></div>
+            <div class="field"><label for="individual-assessment">Pentaksiran</label><select id="individual-assessment"></select></div>
+            <button class="btn secondary" type="button" data-print-target="individual-print">Cetak</button>
+          </div>
+        </div>
+        <div id="individual-print" class="panel">
+          <h2 class="panel-title">Analisis Individu</h2>
+          <div id="individual-output" class="muted">Sila pilih kelas dan pentaksiran.</div>
+        </div>
+      </section>
+
+      <section id="tab-prestasi" class="tab-panel">
+        <div class="panel no-print">
+          <h2 class="panel-title">TAB ANALISIS PRESTASI MATA PELAJARAN</h2>
+          <div class="toolbar two">
+            <div class="field"><label for="performance-assessment">Pentaksiran</label><select id="performance-assessment"></select></div>
+            <div class="field"><label for="performance-flow">Aliran</label><select id="performance-flow"></select></div>
+            <button class="btn secondary" type="button" data-print-target="performance-print">Cetak</button>
+          </div>
+        </div>
+        <div id="performance-print" class="panel">
+          <h2 class="panel-title">Analisis Prestasi Mata Pelajaran</h2>
+          <div id="performance-output" class="muted">Sila pilih pentaksiran dan aliran.</div>
+          <h3 class="panel-title" style="margin-top:18px;">Carta Bar Taburan Bilangan Gred Bagi Setiap Subjek</h3>
+          <div id="performance-chart" class="chart-grid"></div>
+        </div>
+      </section>
+
+      <section id="tab-kedudukan" class="tab-panel">
+        <div class="panel no-print">
+          <h2 class="panel-title">TAB KEDUDUKAN MURID</h2>
+          <div class="toolbar two">
+            <div class="field"><label for="ranking-flow">Aliran</label><select id="ranking-flow"></select></div>
+            <div class="field"><label for="ranking-assessment">Pentaksiran</label><select id="ranking-assessment"></select></div>
+            <button class="btn secondary" type="button" data-print-target="ranking-print">Cetak</button>
+          </div>
+        </div>
+        <div id="ranking-print" class="panel">
+          <h2 class="panel-title">Kedudukan Murid</h2>
+          <div id="ranking-output" class="muted">Sila pilih aliran dan pentaksiran.</div>
+        </div>
+      </section>
+
+      <section id="tab-pelaporan" class="tab-panel">
+        <div class="panel no-print">
+          <h2 class="panel-title">TAB PELAPORAN</h2>
+          <div class="toolbar two">
+            <div class="field"><label for="report-class">Kelas</label><select id="report-class"></select></div>
+            <div class="field"><label for="report-assessment">Pentaksiran</label><select id="report-assessment"></select></div>
+            <button class="btn secondary" type="button" data-print-target="report-print">Cetak Slip</button>
+          </div>
+        </div>
+        <div id="report-print" class="slip-stack"><div class="panel muted">Sila pilih kelas dan pentaksiran.</div></div>
+      </section>
+    </main>
+  </section>
+
+  <section id="parent-app" class="parent-shell hidden">
+    <div class="parent-inner">
+      <div class="panel no-print">
+        <div class="brand-row">
+          <div class="brand-title">
+            <div class="small-badge" style="border-color:#172033;color:#172033;">KSKK</div>
+            <div>
+              <h1>Sistem Analisis Peperiksaan KAFA</h1>
+              <p style="color:var(--muted);">Paparan Ibu Bapa - KAFA SK KOMPLEKS KLIA</p>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
+            <button class="btn secondary" type="button" data-print-target="parent-print">Cetak Slip</button>
+            <button id="parent-logout" class="btn secondary" type="button">Log Keluar</button>
+          </div>
+        </div>
+      </div>
+      <div id="parent-print" class="slip-stack"></div>
+    </div>
+  </section>
+
+  <script>
+    const SCHOOL_NAME = 'KAFA SK KOMPLEKS KLIA';
+    const TEACHER_PASSWORD = 'guruskkompleksklia';
+    const ASSESSMENTS = ['PERTENGAHAN AKADEMIK', 'AKHIR AKADEMIK'];
+    const SUBJECTS = ['B. MELAYU', 'B. INGGERIS', 'MATEMATIK', 'SAINS', 'SEJARAH', 'PEN ISLAM', 'PEN MORAL', 'B. ARAB', 'B TAMIL', 'RBT', 'PJPK', 'PSV', 'MUZIK'];
+    const FLOWS = ['Tahun 1', 'Tahun 2', 'Tahun 3', 'Tahun 4', 'Tahun 5', 'Tahun 6'];
+    const hasAppsScript = Boolean(window.google && google.script && google.script.run);
+    const localMarkKey = 'kafa-exam-local-marks';
+    const $ = (id) => document.getElementById(id);
+
+    const defaultStudents = [
+      { id: 'IC_120101010001', ic: '120101010001', nama_murid: 'ADNI AULIYA BINTI AFIFF AFANDY', kelas: '1 ANGGERIK' },
+      { id: 'IC_120101010002', ic: '120101010002', nama_murid: 'ADRI NASREEN BIN NORMAN', kelas: '1 ANGGERIK' },
+      { id: 'IC_110303100003', ic: '110303100003', nama_murid: 'MUHAMMAD DANISH BIN RIZAL', kelas: '2 ANGGERIK' },
+      { id: 'IC_100505100005', ic: '100505100005', nama_murid: 'ADAM HAZIQ BIN KAMARUL', kelas: '3 ANGGERIK' }
+    ];
+
+    let state = {
+      students: [],
+      marks: [],
+      options: { classes: [], assessments: ASSESSMENTS, subjects: SUBJECTS },
+      teacherPassword: '',
+      parentStudent: null,
+      parentMarks: [],
+      parentRanks: {}
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      wireEvents();
+      hydrateSelects({ classes: classesFromStudents(defaultStudents), assessments: ASSESSMENTS, subjects: SUBJECTS });
+    });
+
+    function wireEvents() {
+      $('teacher-login').addEventListener('submit', handleTeacherLogin);
+      $('parent-login').addEventListener('submit', handleParentLogin);
+      $('teacher-logout').addEventListener('click', logout);
+      $('parent-logout').addEventListener('click', logout);
+      $('save-marks').addEventListener('click', saveMarkTable);
+      document.querySelectorAll('.tab-btn').forEach(button => button.addEventListener('click', () => activateTab(button.dataset.tab)));
+      ['input-class', 'input-assessment', 'input-subject'].forEach(id => $(id).addEventListener('change', renderInputTable));
+      ['individual-class', 'individual-assessment'].forEach(id => $(id).addEventListener('change', renderIndividualAnalysis));
+      ['performance-assessment', 'performance-flow'].forEach(id => $(id).addEventListener('change', renderPerformanceAnalysis));
+      ['ranking-flow', 'ranking-assessment'].forEach(id => $(id).addEventListener('change', renderRanking));
+      ['report-class', 'report-assessment'].forEach(id => $(id).addEventListener('change', renderReports));
+      document.addEventListener('click', event => {
+        const statusButton = event.target.closest('[data-status-action]');
+        if (statusButton) setRowStatus(statusButton.dataset.studentId, statusButton.dataset.statusAction);
+        const printButton = event.target.closest('[data-print-target]');
+        if (printButton) {
+          setPrintContent(printButton.dataset.printTarget);
+          printReport();
+        }
+      });
+      document.addEventListener('input', event => {
+        const input = event.target.closest('[data-mark-input]');
+        if (!input) return;
+        setRowStatus(input.dataset.markInput, '');
+        updateInputDerived(input.dataset.markInput);
+      });
+    }
+
+    function serverCall(name, ...args) {
+      if (hasAppsScript) {
+        return new Promise((resolve, reject) => google.script.run.withSuccessHandler(resolve).withFailureHandler(reject)[name](...args));
+      }
+      return mockServerCall(name, ...args);
+    }
+
+    function mockServerCall(name, ...args) {
+      const localMarks = () => JSON.parse(localStorage.getItem(localMarkKey) || '[]');
+      const saveLocalMarks = (marks) => localStorage.setItem(localMarkKey, JSON.stringify(marks));
+      if (name === 'loginTeacher') {
+        if (args[0] !== TEACHER_PASSWORD) return Promise.reject(new Error('Password guru tidak tepat.'));
+        return Promise.resolve({
+          students: defaultStudents,
+          marks: localMarks(),
+          options: { classes: classesFromStudents(defaultStudents), assessments: ASSESSMENTS, subjects: SUBJECTS },
+          spreadsheetUrl: ''
+        });
+      }
+      if (name === 'lookupStudentByIc') {
+        const clean = cleanIc(args[0]);
+        const student = defaultStudents.find(item => cleanIc(item.ic) === clean);
+        if (!student) return Promise.reject(new Error('Nombor IC tidak dijumpai.'));
+        return Promise.resolve({
+          student,
+          marks: localMarks().filter(mark => mark.student_id === student.id),
+          ranks: parentRanksForStudent(student, defaultStudents, localMarks()),
+          options: { assessments: ASSESSMENTS, subjects: SUBJECTS }
+        });
+      }
+      if (name === 'saveMarks') {
+        const password = args[0];
+        const payload = args[1];
+        if (password !== TEACHER_PASSWORD) return Promise.resolve({ isOk: false, error: 'Password guru tidak tepat.' });
+        let marks = localMarks();
+        payload.rows.forEach(row => {
+          const index = marks.findIndex(mark => mark.student_id === row.student_id && mark.pentaksiran === payload.pentaksiran && mark.subjek === payload.subjek);
+          const hasValue = row.status || row.markah !== '';
+          if (!hasValue) {
+            if (index >= 0) marks.splice(index, 1);
+            return;
+          }
+          const now = new Date().toISOString();
+          const record = {
+            id: row.id || crypto.randomUUID(),
+            student_id: row.student_id,
+            ic: row.ic,
+            nama_murid: row.nama_murid,
+            kelas: row.kelas,
+            pentaksiran: payload.pentaksiran,
+            subjek: payload.subjek,
+            markah: row.markah,
+            status: row.status,
+            gred: row.gred,
+            tafsiran: row.tafsiran,
+            created_at: row.created_at || now,
+            updated_at: now
+          };
+          if (index >= 0) marks[index] = record;
+          else marks.push(record);
+        });
+        saveLocalMarks(marks);
+        return Promise.resolve({ isOk: true, marks });
+      }
+      return Promise.resolve(null);
+    }
+
+    async function handleTeacherLogin(event) {
+      event.preventDefault();
+      const password = $('teacher-password').value.trim();
+      clearLoginAlert();
+      try {
+        const payload = await serverCall('loginTeacher', password);
+        state.teacherPassword = password;
+        state.students = normalizeStudents(payload.students || []);
+        state.marks = normalizeMarks(payload.marks || []);
+        state.options = payload.options || { classes: classesFromStudents(state.students), assessments: ASSESSMENTS, subjects: SUBJECTS };
+        hydrateSelects(state.options);
+        showTeacherApp();
+        renderAllTeacherViews();
+      } catch (err) {
+        showLoginAlert(err.message || 'Login guru tidak berjaya.', true);
+      }
+    }
+
+    async function handleParentLogin(event) {
+      event.preventDefault();
+      const ic = $('parent-ic').value.trim();
+      clearLoginAlert();
+      try {
+        const payload = await serverCall('lookupStudentByIc', ic);
+        state.parentStudent = payload.student;
+        state.parentMarks = normalizeMarks(payload.marks || []);
+        state.parentRanks = payload.ranks || {};
+        if (payload.options) state.options = { ...state.options, ...payload.options };
+        showParentApp();
+        renderParentSlip();
+      } catch (err) {
+        showLoginAlert(err.message || 'Nombor IC tidak dijumpai.', true);
+      }
+    }
+
+    function logout() {
+      state.teacherPassword = '';
+      state.parentStudent = null;
+      state.parentMarks = [];
+      state.parentRanks = {};
+      $('teacher-password').value = '';
+      $('parent-ic').value = '';
+      $('teacher-app').classList.add('hidden');
+      $('parent-app').classList.add('hidden');
+      $('login-page').classList.remove('hidden');
+    }
+
+    function showTeacherApp() {
+      $('login-page').classList.add('hidden');
+      $('parent-app').classList.add('hidden');
+      $('teacher-app').classList.remove('hidden');
+      activateTab('input');
+    }
+
+    function showParentApp() {
+      $('login-page').classList.add('hidden');
+      $('teacher-app').classList.add('hidden');
+      $('parent-app').classList.remove('hidden');
+    }
+
+    function showLoginAlert(message, isError) {
+      const box = $('login-alert');
+      box.textContent = message;
+      box.className = `alert${isError ? ' error' : ''}`;
+    }
+
+    function clearLoginAlert() {
+      $('login-alert').className = 'hidden';
+      $('login-alert').textContent = '';
+    }
+
+    function showAppAlert(message, isError) {
+      const box = $('app-alert');
+      box.textContent = message;
+      box.className = `alert no-print${isError ? ' error' : ''}`;
+      window.clearTimeout(showAppAlert.timer);
+      showAppAlert.timer = window.setTimeout(() => box.classList.add('hidden'), 3200);
+    }
+
+    function hydrateSelects(options) {
+      const classes = options.classes || [];
+      const assessments = options.assessments || ASSESSMENTS;
+      const subjects = options.subjects || SUBJECTS;
+      fillSelect('input-class', classes, 'Pilih Kelas');
+      fillSelect('individual-class', classes, 'Pilih Kelas');
+      fillSelect('report-class', classes, 'Pilih Kelas');
+      fillSelect('input-assessment', assessments, 'Pilih Pentaksiran');
+      fillSelect('individual-assessment', assessments, 'Pilih Pentaksiran');
+      fillSelect('performance-assessment', assessments, 'Pilih Pentaksiran');
+      fillSelect('ranking-assessment', assessments, 'Pilih Pentaksiran');
+      fillSelect('report-assessment', assessments, 'Pilih Pentaksiran');
+      fillSelect('input-subject', subjects, 'Pilih Subjek');
+      fillSelect('performance-flow', FLOWS, 'Pilih Aliran');
+      fillSelect('ranking-flow', FLOWS, 'Pilih Aliran');
+    }
+
+    function fillSelect(id, values, placeholder) {
+      const select = $(id);
+      if (!select) return;
+      const current = select.value;
+      select.innerHTML = `<option value="">${escapeHtml(placeholder)}</option>` + values.map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('');
+      if (values.includes(current)) select.value = current;
+    }
+
+    function activateTab(tabName) {
+      document.querySelectorAll('.tab-btn').forEach(button => button.classList.toggle('active', button.dataset.tab === tabName));
+      document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.toggle('active', panel.id === `tab-${tabName}`));
+    }
+
+    function renderAllTeacherViews() {
+      renderInputTable();
+      renderIndividualAnalysis();
+      renderPerformanceAnalysis();
+      renderRanking();
+      renderReports();
+    }
+
+    function renderInputTable() {
+      const className = $('input-class').value;
+      const assessment = $('input-assessment').value;
+      const subject = $('input-subject').value;
+      const wrap = $('input-table-wrap');
+      const hint = $('input-table-hint');
+      if (!className || !assessment || !subject) {
+        wrap.classList.add('hidden');
+        hint.classList.remove('hidden');
+        hint.textContent = 'Sila pilih kelas, pentaksiran dan subjek.';
+        return;
+      }
+      const students = studentsByClass(className);
+      if (!students.length) {
+        wrap.classList.add('hidden');
+        hint.classList.remove('hidden');
+        hint.textContent = 'Tiada murid untuk kelas ini.';
+        return;
+      }
+      hint.classList.add('hidden');
+      wrap.classList.remove('hidden');
+      wrap.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th class="center">Bil</th>
+              <th>Nama Murid</th>
+              <th class="center">Markah</th>
+              <th class="center">Tindakan</th>
+              <th class="center">Gred</th>
+              <th>Tafsiran</th>
+            </tr>
+          </thead>
+          <tbody>${students.map((student, index) => inputRow(student, index, assessment, subject)).join('')}</tbody>
+        </table>`;
+    }
+
+    function inputRow(student, index, assessment, subject) {
+      const existing = getMark(student.id, assessment, subject);
+      const status = existing ? existing.status : '';
+      const markah = existing && !status ? existing.markah : '';
+      const grade = existing ? existing.gred : '';
+      const tafsiran = existing ? existing.tafsiran : '';
+      return `
+        <tr data-input-row="${escapeHtml(student.id)}">
+          <td class="center">${index + 1}</td>
+          <td><strong>${escapeHtml(student.nama_murid)}</strong><br><span class="muted">${escapeHtml(student.ic)}</span></td>
+          <td class="center"><input class="mark-input" type="number" min="0" max="100" data-mark-input="${escapeHtml(student.id)}" value="${escapeHtml(markah)}" ${status ? 'disabled' : ''}></td>
+          <td><div class="row-actions">
+            <button type="button" class="mini-btn ${status === 'TD' ? 'active' : ''}" data-student-id="${escapeHtml(student.id)}" data-status-action="TD">TD</button>
+            <button type="button" class="mini-btn ${status === 'TH' ? 'active' : ''}" data-student-id="${escapeHtml(student.id)}" data-status-action="TH">TH</button>
+          </div></td>
+          <td class="center" data-grade-cell="${escapeHtml(student.id)}">${gradeBadge(grade)}</td>
+          <td data-tafsiran-cell="${escapeHtml(student.id)}">${escapeHtml(tafsiran)}</td>
+          <td class="hidden" data-status-value="${escapeHtml(student.id)}">${escapeHtml(status)}</td>
+        </tr>`;
+    }
+
+    function setRowStatus(studentId, status) {
+      const current = document.querySelector(`[data-status-value="${cssEscape(studentId)}"]`);
+      const input = document.querySelector(`[data-mark-input="${cssEscape(studentId)}"]`);
+      const row = document.querySelector(`[data-input-row="${cssEscape(studentId)}"]`);
+      if (!current || !input || !row) return;
+      const nextStatus = current.textContent === status ? '' : status;
+      current.textContent = nextStatus;
+      input.disabled = Boolean(nextStatus);
+      if (nextStatus) input.value = '';
+      row.querySelectorAll('[data-status-action]').forEach(button => button.classList.toggle('active', button.dataset.statusAction === nextStatus));
+      updateInputDerived(studentId);
+    }
+
+    function updateInputDerived(studentId) {
+      const status = textOf(`[data-status-value="${cssEscape(studentId)}"]`);
+      const input = document.querySelector(`[data-mark-input="${cssEscape(studentId)}"]`);
+      const gradeCell = document.querySelector(`[data-grade-cell="${cssEscape(studentId)}"]`);
+      const tafsiranCell = document.querySelector(`[data-tafsiran-cell="${cssEscape(studentId)}"]`);
+      const mark = input && input.value !== '' ? Number(input.value) : NaN;
+      const grade = status || (Number.isFinite(mark) ? gradeForMark(mark) : '');
+      if (gradeCell) gradeCell.innerHTML = gradeBadge(grade);
+      if (tafsiranCell) tafsiranCell.textContent = tafsiranForGrade(grade);
+    }
+
+    async function saveMarkTable() {
+      const className = $('input-class').value;
+      const assessment = $('input-assessment').value;
+      const subject = $('input-subject').value;
+      if (!className || !assessment || !subject) {
+        showAppAlert('Sila pilih kelas, pentaksiran dan subjek.', true);
+        return;
+      }
+      const rows = [];
+      for (const student of studentsByClass(className)) {
+        const input = document.querySelector(`[data-mark-input="${cssEscape(student.id)}"]`);
+        const raw = input ? input.value.trim() : '';
+        const status = textOf(`[data-status-value="${cssEscape(student.id)}"]`);
+        const existing = getMark(student.id, assessment, subject);
+        if (!status && raw !== '') {
+          const mark = Number(raw);
+          if (!Number.isFinite(mark) || mark < 0 || mark > 100) {
+            showAppAlert(`Markah ${student.nama_murid} mesti antara 0 hingga 100.`, true);
+            return;
+          }
+        }
+        const rounded = !status && raw !== '' ? String(Math.round(Number(raw))) : '';
+        const grade = status || (rounded !== '' ? gradeForMark(Number(rounded)) : '');
+        rows.push({
+          id: existing ? existing.id : '',
+          student_id: student.id,
+          ic: student.ic,
+          nama_murid: student.nama_murid,
+          kelas: student.kelas,
+          markah: rounded,
+          status,
+          gred: grade,
+          tafsiran: tafsiranForGrade(grade),
+          created_at: existing ? existing.created_at : ''
+        });
+      }
+      try {
+        const result = await serverCall('saveMarks', state.teacherPassword, { pentaksiran: assessment, subjek: subject, rows });
+        if (!result || !result.isOk) throw new Error(result && result.error ? result.error : 'Ralat. Sila cuba semula.');
+        state.marks = normalizeMarks(result.marks || []);
+        renderAllTeacherViews();
+        showAppAlert('Markah berjaya disimpan.');
+      } catch (err) {
+        showAppAlert(err.message || 'Ralat. Sila cuba semula.', true);
+      }
+    }
+
+    function renderIndividualAnalysis() {
+      const className = $('individual-class').value;
+      const assessment = $('individual-assessment').value;
+      const output = $('individual-output');
+      if (!className || !assessment) {
+        output.innerHTML = 'Sila pilih kelas dan pentaksiran.';
+        output.className = 'muted';
+        return;
+      }
+      const ranked = rankStudents(studentsByClass(className), assessment);
+      const best = bestBySubject(studentsByClass(className), assessment);
+      output.className = '';
+      output.innerHTML = `
+        <div class="table-wrap"><table><thead><tr>
+          <th class="center">Kedudukan</th><th>Nama Murid</th><th>Subjek</th><th class="center">Markah</th><th class="center">Gred</th><th class="center">Jumlah Markah</th><th class="center">Purata</th><th class="center">Gred Purata</th>
+        </tr></thead><tbody>
+          ${ranked.length ? ranked.map(item => `<tr>
+            <td class="center"><strong>${item.position}</strong></td>
+            <td><strong>${escapeHtml(item.student.nama_murid)}</strong></td>
+            <td>${subLines(item.records.map(record => record.subjek))}</td>
+            <td class="center">${subLines(item.records.map(record => record.markah))}</td>
+            <td class="center">${subLines(item.records.map(record => record.gred))}</td>
+            <td class="center">${item.total}</td>
+            <td class="center">${formatNumber(item.average)}</td>
+            <td class="center">${gradeBadge(gradeForMark(item.average))}</td>
+          </tr>`).join('') : emptyRow(8)}
+        </tbody></table></div>
+        <h3 class="panel-title" style="margin-top:18px;">Murid Terbaik Mengikut Subjek</h3>
+        <div class="table-wrap"><table><thead><tr>
+          <th class="center">Bil</th><th>Subjek</th><th>Nama Murid</th><th class="center">Markah</th><th class="center">Gred</th><th>Pencapaian</th>
+        </tr></thead><tbody>
+          ${best.length ? best.map((item, index) => `<tr>
+            <td class="center">${index + 1}</td>
+            <td>${escapeHtml(item.subject)}</td>
+            <td>${escapeHtml(item.names.join(', '))}</td>
+            <td class="center">${item.mark}</td>
+            <td class="center">${gradeBadge(gradeForMark(item.mark))}</td>
+            <td>${escapeHtml(tafsiranForGrade(gradeForMark(item.mark)))}</td>
+          </tr>`).join('') : emptyRow(6)}
+        </tbody></table></div>`;
+    }
+
+    function renderPerformanceAnalysis() {
+      const assessment = $('performance-assessment').value;
+      const flow = $('performance-flow').value;
+      const output = $('performance-output');
+      const chart = $('performance-chart');
+      if (!assessment || !flow) {
+        output.innerHTML = 'Sila pilih pentaksiran dan aliran.';
+        output.className = 'muted';
+        chart.innerHTML = '';
+        return;
+      }
+      const classNames = classesForFlow(flow);
+      const rows = getSubjects().map(subject => subjectPerformance(subject, assessment, classNames));
+      output.className = 'table-wrap';
+      output.innerHTML = `
+        <table><thead><tr>
+          <th class="center">Bil</th><th>Mata Pelajaran</th><th class="center">Bil Calon Daftar</th><th class="center">Ambil</th><th class="center">TH</th><th class="center">A (Bil, %)</th><th class="center">B (Bil, %)</th><th class="center">C (Bil, %)</th><th class="center">D (Bil, %)</th><th class="center">Lulus</th><th class="center">Gagal</th>
+        </tr></thead><tbody>
+          ${rows.map((row, index) => `<tr>
+            <td class="center">${index + 1}</td><td>${escapeHtml(row.subject)}</td><td class="center">${row.registered}</td><td class="center">${row.sat}</td><td class="center">${row.absent}</td><td class="center">${gradeSummary(row, 'A')}</td><td class="center">${gradeSummary(row, 'B')}</td><td class="center">${gradeSummary(row, 'C')}</td><td class="center">${gradeSummary(row, 'D')}</td><td class="center">${row.pass}</td><td class="center">${row.fail}</td>
+          </tr>`).join('')}
+        </tbody></table>`;
+      chart.innerHTML = rows.map(row => chartRow(row)).join('');
+    }
+
+    function renderRanking() {
+      const flow = $('ranking-flow').value;
+      const assessment = $('ranking-assessment').value;
+      const output = $('ranking-output');
+      if (!flow || !assessment) {
+        output.innerHTML = 'Sila pilih aliran dan pentaksiran.';
+        output.className = 'muted';
+        return;
+      }
+      const ranked = rankStudents(studentsForFlow(flow), assessment);
+      output.className = 'table-wrap';
+      output.innerHTML = `
+        <table><thead><tr><th class="center">Kedudukan</th><th>Nama Murid</th><th>Kelas</th><th class="center">Jumlah Markah</th><th class="center">Purata</th></tr></thead>
+        <tbody>${ranked.length ? ranked.map(item => `<tr><td class="center"><strong>${item.position}</strong></td><td>${escapeHtml(item.student.nama_murid)}</td><td>${escapeHtml(item.student.kelas)}</td><td class="center">${item.total}</td><td class="center">${formatNumber(item.average)}</td></tr>`).join('') : emptyRow(5)}</tbody></table>`;
+    }
+
+    function renderReports() {
+      const className = $('report-class').value;
+      const assessment = $('report-assessment').value;
+      const wrap = $('report-print');
+      if (!className || !assessment) {
+        wrap.innerHTML = '<div class="panel muted">Sila pilih kelas dan pentaksiran.</div>';
+        return;
+      }
+      const students = studentsByClass(className);
+      wrap.innerHTML = students.length ? students.map(student => buildSlip(student, assessment, state.marks)).join('') : '<div class="panel muted">Tiada murid untuk kelas ini.</div>';
+    }
+
+    function renderParentSlip() {
+      const student = state.parentStudent;
+      const marks = state.parentMarks;
+      const assessment = latestAssessmentForMarks(marks);
+      $('parent-print').innerHTML = buildSlip(student, assessment, marks, true);
+    }
+
+    function buildSlip(student, assessment, markSource, parentMode = false) {
+      const subjectOrder = getSubjects();
+      const records = recordsForStudent(student.id, assessment, markSource).sort((a, b) => subjectSortIndex(a.subjek, subjectOrder) - subjectSortIndex(b.subjek, subjectOrder));
+      const valid = records.filter(isValidMark);
+      const total = valid.reduce((sum, record) => sum + Number(record.markah), 0);
+      const average = valid.length ? total / valid.length : 0;
+      const overallGrade = valid.length ? gradeForMark(average) : '';
+      const rankMap = parentMode ? new Map() : rankMapForClass(student.kelas, assessment);
+      const position = parentMode ? (state.parentRanks[assessment] || '-') : (rankMap.get(student.id) || '-');
+      const decision = valid.length ? (['A', 'B', 'C'].includes(overallGrade) ? 'Lulus' : 'Gagal') : 'Tiada Rekod';
+      return `
+        <article class="slip">
+          <div class="slip-head"><div class="slip-logo">KSKK</div><div><h2>${SCHOOL_NAME}</h2><h3>${escapeHtml(assessment).toUpperCase()}</h3><h3>SLIP PENCAPAIAN MURID</h3></div><div></div></div>
+          <table class="compact-table"><tbody><tr><td><strong>Nama Murid</strong><br>${escapeHtml(student.nama_murid)}</td><td><strong>Kelas</strong><br>${escapeHtml(student.kelas)}</td></tr></tbody></table>
+          <table class="compact-table"><thead><tr><th class="center">Bil</th><th>Subjek</th><th class="center">Markah</th><th class="center">Gred</th><th>Tafsiran</th></tr></thead><tbody>
+            ${records.length ? records.map((record, index) => `<tr><td class="center">${index + 1}</td><td>${escapeHtml(record.subjek)}</td><td class="center">${escapeHtml(displayMark(record))}</td><td class="center">${escapeHtml(record.gred)}</td><td>${escapeHtml(record.tafsiran)}</td></tr>`).join('') : `<tr><td colspan="5" class="center muted">Tiada rekod markah.</td></tr>`}
+          </tbody></table>
+          <table class="compact-table"><tbody><tr><td><strong>Bilangan Mata Pelajaran</strong><br>${valid.length}</td><td><strong>Jumlah Markah</strong><br>${total}</td><td><strong>Purata Markah</strong><br>${valid.length ? formatNumber(average) : '-'}</td><td><strong>Kedudukan</strong><br>${position}</td></tr><tr><td colspan="2"><strong>Keputusan</strong><br>${decision}</td><td colspan="2"><strong>Gred Keseluruhan</strong><br>${overallGrade || '-'}</td></tr></tbody></table>
+          <table class="compact-table"><tbody><tr><td><strong>Ulasan Guru Kelas</strong><br>${escapeHtml(commentForGrade(overallGrade))}</td></tr></tbody></table>
+          <table class="compact-table signature-table"><tbody><tr><td>Guru Kelas</td><td>Guru Besar / Pengetua</td><td>Ibu Bapa / Penjaga</td></tr></tbody></table>
+        </article>`;
+    }
+
+    function rankStudents(students, assessment) {
+      return students.map(student => {
+        const records = recordsForStudent(student.id, assessment, state.marks).filter(isValidMark);
+        const total = records.reduce((sum, record) => sum + Number(record.markah), 0);
+        const average = records.length ? total / records.length : 0;
+        return { student, records, total, average };
+      }).filter(item => item.records.length)
+        .sort((a, b) => b.average - a.average || b.total - a.total || a.student.nama_murid.localeCompare(b.student.nama_murid, 'ms'))
+        .map((item, index) => ({ ...item, position: index + 1 }));
+    }
+
+    function rankMapForClass(className, assessment) {
+      return new Map(rankStudents(studentsByClass(className), assessment).map(item => [item.student.id, item.position]));
+    }
+
+    function parentRanksForStudent(student, students, marks) {
+      const previousStudents = state.students;
+      const previousMarks = state.marks;
+      state.students = normalizeStudents(students);
+      state.marks = normalizeMarks(marks);
+      const ranks = {};
+      getAssessments().forEach(assessment => { ranks[assessment] = rankMapForClass(student.kelas, assessment).get(student.id) || ''; });
+      state.students = previousStudents;
+      state.marks = previousMarks;
+      return ranks;
+    }
+
+    function bestBySubject(students, assessment) {
+      return getSubjects().map(subject => {
+        const rows = students.flatMap(student => {
+          const record = getMark(student.id, assessment, subject);
+          return record && isValidMark(record) ? [{ student, record }] : [];
+        });
+        if (!rows.length) return null;
+        const top = Math.max(...rows.map(row => Number(row.record.markah)));
+        return { subject, mark: top, names: rows.filter(row => Number(row.record.markah) === top).map(row => row.student.nama_murid) };
+      }).filter(Boolean);
+    }
+
+    function subjectPerformance(subject, assessment, classNames) {
+      const records = state.marks.filter(record => record.pentaksiran === assessment && record.subjek === subject && classNames.includes(record.kelas));
+      const registeredRecords = records.filter(record => record.status !== 'TD');
+      const satRecords = records.filter(isValidMark);
+      const gradeCounts = { A: 0, B: 0, C: 0, D: 0 };
+      satRecords.forEach(record => { if (gradeCounts[record.gred] !== undefined) gradeCounts[record.gred] += 1; });
+      return { subject, registered: registeredRecords.length, sat: satRecords.length, absent: records.filter(record => record.status === 'TH').length, gradeCounts, pass: gradeCounts.A + gradeCounts.B + gradeCounts.C, fail: gradeCounts.D };
+    }
+
+    function gradeSummary(row, grade) {
+      const count = row.gradeCounts[grade] || 0;
+      const percent = row.sat ? (count / row.sat * 100).toFixed(1) : '0.0';
+      return `${count}, ${percent}%`;
+    }
+
+    function chartRow(row) {
+      const max = Math.max(1, ...Object.values(row.gradeCounts));
+      const colors = { A: '#087443', B: '#175cd3', C: '#a15c00', D: '#b42318' };
+      return `<div class="chart-row"><div class="chart-label">${escapeHtml(row.subject)}</div><div class="bar-pack">${['A','B','C','D'].map(grade => {
+        const count = row.gradeCounts[grade] || 0;
+        const width = Math.max(3, count / max * 100);
+        return `<div><div class="bar-track"><div class="bar-fill" style="width:${width}%;background:${colors[grade]};"></div></div><div class="bar-caption">Gred ${grade}: ${count}</div></div>`;
+      }).join('')}</div></div>`;
+    }
+
+    function getMark(studentId, assessment, subject) {
+      return state.marks.find(record => record.student_id === studentId && record.pentaksiran === assessment && record.subjek === subject);
+    }
+
+    function recordsForStudent(studentId, assessment, source) {
+      return (source || state.marks).filter(record => record.student_id === studentId && record.pentaksiran === assessment && (record.markah !== '' || record.status));
+    }
+
+    function latestAssessmentForMarks(marks) {
+      const assessmentOrder = getAssessments();
+      for (let i = assessmentOrder.length - 1; i >= 0; i -= 1) {
+        if (marks.some(mark => mark.pentaksiran === assessmentOrder[i])) return assessmentOrder[i];
+      }
+      return assessmentOrder[assessmentOrder.length - 1] || '';
+    }
+
+    function getAssessments() { return state.options.assessments && state.options.assessments.length ? state.options.assessments : ASSESSMENTS; }
+    function getSubjects() { return state.options.subjects && state.options.subjects.length ? state.options.subjects : SUBJECTS; }
+    function subjectSortIndex(subject, subjectOrder) {
+      const index = subjectOrder.indexOf(subject);
+      return index >= 0 ? index : subjectOrder.length;
+    }
+    function isValidMark(record) { return !record.status && record.markah !== '' && Number.isFinite(Number(record.markah)); }
+    function displayMark(record) { return record.status ? record.status : record.markah; }
+    function gradeForMark(mark) {
+      const n = Number(mark);
+      if (!Number.isFinite(n)) return '';
+      if (n >= 80) return 'A';
+      if (n >= 60) return 'B';
+      if (n >= 50) return 'C';
+      return 'D';
+    }
+    function tafsiranForGrade(grade) {
+      return { A: 'Cemerlang', B: 'Baik', C: 'Memuaskan', D: 'Gagal', TD: 'Tidak Ditaksir / Tidak Daftar', TH: 'Tidak Hadir' }[grade] || '';
+    }
+    function commentForGrade(grade) {
+      if (grade === 'A') return 'Tahniah. Murid menunjukkan pencapaian yang cemerlang. Teruskan usaha untuk mengekalkan prestasi ini.';
+      if (grade === 'B') return 'Tahniah. Murid menunjukkan pencapaian yang baik. Teruskan usaha untuk mencapai keputusan yang lebih cemerlang.';
+      if (grade === 'C') return 'Murid menunjukkan pencapaian yang memuaskan. Murid digalakkan untuk meningkatkan usaha dan membuat ulang kaji secara konsisten.';
+      if (grade === 'D') return 'Murid perlu meningkatkan usaha dan memberi lebih tumpuan dalam pembelajaran. Bimbingan berterusan daripada guru dan ibu bapa amat digalakkan.';
+      return 'Tiada ulasan dijana kerana rekod markah sah belum lengkap.';
+    }
+    function gradeBadge(grade) {
+      if (!grade) return '<span class="badge grade-x">-</span>';
+      const cls = grade === 'A' ? 'grade-a' : grade === 'B' ? 'grade-b' : grade === 'C' ? 'grade-c' : grade === 'D' ? 'grade-d' : 'grade-x';
+      return `<span class="badge ${cls}">${escapeHtml(grade)}</span>`;
+    }
+    function studentsByClass(className) {
+      return state.students.filter(student => student.kelas === className).sort((a, b) => a.nama_murid.localeCompare(b.nama_murid, 'ms'));
+    }
+    function classesForFlow(flow) {
+      const number = flow.match(/\d/) ? flow.match(/\d/)[0] : '';
+      return state.options.classes.filter(className => className.includes(number));
+    }
+    function studentsForFlow(flow) {
+      const classes = classesForFlow(flow);
+      return state.students.filter(student => classes.includes(student.kelas));
+    }
+    function classesFromStudents(students) {
+      return [...new Set(students.map(student => student.kelas).filter(Boolean))]
+        .sort((a, b) => a.localeCompare(b, 'ms', { numeric: true, sensitivity: 'base' }));
+    }
+    function normalizeStudents(students) {
+      return students.map(student => ({
+        id: String(student.id || '').trim(),
+        ic: String(student.ic || '').trim(),
+        nama_murid: String(student.nama_murid || '').trim(),
+        kelas: String(student.kelas || '').trim()
+      })).filter(student => student.id && student.nama_murid && student.kelas);
+    }
+    function normalizeMarks(marks) {
+      return marks.map(mark => ({
+        id: String(mark.id || '').trim(),
+        student_id: String(mark.student_id || '').trim(),
+        ic: String(mark.ic || '').trim(),
+        nama_murid: String(mark.nama_murid || '').trim(),
+        kelas: String(mark.kelas || '').trim(),
+        pentaksiran: String(mark.pentaksiran || '').trim(),
+        subjek: String(mark.subjek || '').trim(),
+        markah: String(mark.markah || '').trim(),
+        status: String(mark.status || '').trim().toUpperCase(),
+        gred: String(mark.gred || '').trim().toUpperCase(),
+        tafsiran: String(mark.tafsiran || '').trim(),
+        created_at: String(mark.created_at || '').trim(),
+        updated_at: String(mark.updated_at || '').trim()
+      }));
+    }
+    function subLines(values) { return `<div class="sub-lines">${values.map(value => `<span>${escapeHtml(value)}</span>`).join('')}</div>`; }
+    function emptyRow(colspan) { return `<tr><td colspan="${colspan}" class="center muted">Tiada rekod.</td></tr>`; }
+    function textOf(selector) {
+      const element = document.querySelector(selector);
+      return element ? element.textContent.trim() : '';
+    }
+    function formatNumber(value) { return Number(value).toFixed(2); }
+    function cleanIc(ic) { return String(ic || '').replace(/\D/g, ''); }
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[char]);
+    }
+    function cssEscape(value) {
+      if (window.CSS && CSS.escape) return CSS.escape(value);
+      return String(value).replace(/"/g, '\\"');
+    }
+    function setPrintContent(id) {
+      document.querySelectorAll('.print-content').forEach(element => element.classList.remove('print-content'));
+      const target = $(id);
+      if (target) target.classList.add('print-content');
+    }
+
+    function printReport() {
+      const content = document.querySelector('.print-content');
+
+      if (!content) {
+        alert('Tiada kandungan untuk dicetak.');
+        return;
+      }
+
+      const printWindow = window.open('', '_blank');
+
+      printWindow.document.write(`<!DOCTYPE html>
+<html>
+<head>
+  <title>Cetak Laporan</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 0; font-family: Arial, sans-serif; background: #ffffff; color: #000000; }
+    .print-page { width: 210mm; min-height: 297mm; padding: 12mm; margin: auto; background: #ffffff; }
+    h1, h2, h3 { text-align: center; margin: 4px 0; }
+    h1 { font-size: 18px; font-weight: bold; }
+    h2 { font-size: 15px; font-weight: bold; }
+    h3 { font-size: 13px; font-weight: bold; }
+    table { width: 100%; border-collapse: collapse; margin-top: 8px; margin-bottom: 10px; font-size: 11px; page-break-inside: avoid; }
+    th, td { border: 1px solid #000; padding: 5px; text-align: left; vertical-align: top; }
+    th { background: #f2f2f2; font-weight: bold; text-align: center; }
+    .center { text-align: center; }
+    .right { text-align: right; }
+    .signature-table td { height: 55px; text-align: center; vertical-align: bottom; }
+    .slip { page-break-after: always; page-break-inside: avoid; }
+    .slip:last-child { page-break-after: auto; }
+    .slip-head { display: grid; grid-template-columns: 50px 1fr 50px; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .slip-logo { width: 44px; height: 44px; border: 1px solid #000; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: bold; }
+    .badge { font-weight: bold; }
+    .chart-grid, .chart-row, .bar-pack { display: block; }
+    .bar-track { border: 1px solid #000; height: 16px; margin: 3px 0 6px; }
+    .bar-fill { height: 100%; }
+    @media print {
+      body { margin: 0; padding: 0; }
+      .print-page { width: 210mm; min-height: 297mm; margin: 0; padding: 12mm; }
+      table { page-break-inside: avoid; }
+      tr { page-break-inside: avoid; page-break-after: auto; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body><div class="print-page">${content.innerHTML}</div></body>
+</html>`);
+
+      printWindow.document.close();
+      printWindow.print();
+    }
+  </script>
+</body>
+</html>
