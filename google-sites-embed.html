@@ -1,0 +1,40 @@
+<!--
+  Cara guna dalam Google Sites:
+  1. Deploy sistem ini dahulu sebagai Google Apps Script Web App.
+  2. Salin URL Web App yang berakhir dengan /exec.
+  3. URL Web App di bawah boleh dikemas kini jika deployment Apps Script berubah.
+  4. Dalam Google Sites: Insert > Embed > Embed code.
+  5. Tampal semua kod ini dan klik Insert.
+
+  Penting:
+  Google Sites tidak boleh menjalankan google.script.run secara terus.
+  Jadi sistem Google Sheet perlu berjalan melalui Apps Script Web App,
+  kemudian Google Sites hanya embed paparan sistem tersebut.
+-->
+
+<div id="kafa-exam-frame-wrap" style="width:100%; min-height:900px;">
+  <iframe
+    id="kafa-exam-frame"
+    title="Sistem Analisis Peperiksaan KAFA"
+    src="https://script.google.com/macros/s/AKfycbze5wLruriUkGCViHDXt23enYKH3xmLGg9YKujqQDyCY1Z6OirWbACLbGIMQIgMthMk6g/exec"
+    style="width:100%; height:900px; border:0; border-radius:8px; background:#f8fafc;"
+    loading="lazy"
+    allowfullscreen>
+  </iframe>
+</div>
+
+<script>
+  (function () {
+    var frame = document.getElementById('kafa-exam-frame');
+    var wrap = document.getElementById('kafa-exam-frame-wrap');
+
+    function resizeFrame() {
+      var height = Math.max(760, window.innerHeight - 120);
+      frame.style.height = height + 'px';
+      wrap.style.minHeight = height + 'px';
+    }
+
+    resizeFrame();
+    window.addEventListener('resize', resizeFrame);
+  })();
+</script>
